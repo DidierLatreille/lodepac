@@ -1,8 +1,13 @@
 <script setup lang="ts">
 import menuImage from './assets/menu.jpg'
 import './assets/css/main.css'
+import { siteInfo } from '#shared/utils/seo'
 
-const instagram = 'https://www.instagram.com/lodepac/'
+const instagram = siteInfo.instagram
+const unitPrice = 14000
+const formattedPrice = new Intl.NumberFormat('es-AR', {
+  style: 'currency', currency: 'ARS', maximumFractionDigits: 0,
+}).format(unitPrice)
 const mobileMenuOpen = ref(false)
 const burritos = [
   { number: '01', name: 'BIRRIA', subtitle: 'México, bien envuelto.', description: 'Carne tierna y desmechada, cocinada durante horas con chiles y especias. Mucho queso y una tortilla lista para bancarse todo.', tags: ['COCCIÓN LENTA', 'MUCHO QUESO'], detail: 'Aprox. 350 g por burrito · Aprox. 70 g de proteína', className: 'birria' },
@@ -12,12 +17,16 @@ const burritos = [
 
 function closeMenu() { mobileMenuOpen.value = false }
 
-useSeoMeta({
-  title: 'Lo de Pac — Burritos bien cargados en Zona Norte',
-  description: 'Birria, Korean BBQ Chicken y Philly Cheesesteak. Pedí tus burritos de Lo de Pac por Instagram. Delivery en Vicente López y Martínez.',
-  themeColor: '#1f4075',
-})
-useHead({ htmlAttrs: { lang: 'es-AR' }, link: [{ rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }] })
+const menuNames = {
+  birria: 'Burrito de birria',
+  korean: 'Burrito Korean BBQ Chicken',
+  philly: 'Burrito Philly Cheesesteak',
+} as const
+
+useLandingSeo(burritos.map(burrito => ({
+  name: menuNames[burrito.className as keyof typeof menuNames],
+  description: burrito.description,
+})), unitPrice)
 </script>
 
 <template>
@@ -35,10 +44,10 @@ useHead({ htmlAttrs: { lang: 'es-AR' }, link: [{ rel: 'icon', type: 'image/svg+x
     <main id="contenido">
       <section id="inicio" class="hero" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <p class="eyebrow"><span class="little-star" aria-hidden="true">✳</span> BURRITOS BIEN CARGADOS</p>
+          <p class="eyebrow"><span class="little-star" aria-hidden="true">✳</span> LO DE PAC · BURRITOS EN ZONA NORTE</p>
           <h1 id="hero-title">POCO<br>CHAMUYO.<br><span>MUCHO</span><br>RELLENO.</h1>
-          <p class="hero-description">Cocción lenta. Queso sin miedo.<br>Un burrito que se banca tu hambre.</p>
-          <div class="hero-actions"><a class="button" href="#burritos">Elegí tu burrito <span aria-hidden="true">↓</span></a><span class="price-note">$14.000 <small>POR UNIDAD</small></span></div>
+          <p class="hero-description">Burritos con delivery en Vicente López y Martínez.<br>Cocción lenta. Queso sin miedo.</p>
+          <div class="hero-actions"><a class="button" href="#burritos">Elegí tu burrito <span aria-hidden="true">↓</span></a><span class="price-note">{{ formattedPrice }} <small>POR UNIDAD</small></span></div>
         </div>
         <div class="hero-art" aria-label="Burritos del menú de Lo de Pac">
           <span class="hero-caption">el bajón tiene<br><em>nuevo favorito.</em></span>
@@ -51,7 +60,7 @@ useHead({ htmlAttrs: { lang: 'es-AR' }, link: [{ rel: 'icon', type: 'image/svg+x
       </section>
       <div class="flavor-strip" aria-hidden="true"><div class="flavor-track"><span>BIRRIA</span><b>✳</b><span>KOREAN BBQ</span><b>✳</b><span>PHILLY CHEESESTEAK</span><b>✳</b><span>BIRRIA</span><b>✳</b><span>KOREAN BBQ</span><b>✳</b><span>PHILLY CHEESESTEAK</span><b>✳</b></div></div>
       <section id="burritos" class="menu-section" aria-labelledby="menu-title">
-        <div class="section-heading"><div><p class="eyebrow">EL TRÍO QUE NO FALLA</p><h2 id="menu-title">ELEGÍ TU<br><span>FAVORITO.</span></h2></div><p>Tres personalidades.<br>El mismo compromiso con el relleno.</p></div>
+        <div class="section-heading"><div><p class="eyebrow">EL TRÍO QUE NO FALLA</p><h2 id="menu-title">ELEGÍ TU<br><span>BURRITO.</span></h2></div><p>Birria, Korean BBQ Chicken y Philly Cheesesteak.<br>El mismo compromiso con el relleno.</p></div>
         <div class="burrito-grid">
           <article v-for="burrito in burritos" :key="burrito.number" class="burrito-card" :class="burrito.className">
             <div class="card-top"><span>{{ burrito.number }} / EL MENÚ</span><span class="card-star" aria-hidden="true">✳</span></div>
@@ -59,7 +68,7 @@ useHead({ htmlAttrs: { lang: 'es-AR' }, link: [{ rel: 'icon', type: 'image/svg+x
             <p class="card-subtitle">{{ burrito.subtitle }}</p>
             <div class="card-tags"><span v-for="tag in burrito.tags" :key="tag">{{ tag }}</span></div>
             <p class="card-description">{{ burrito.description }}</p><p class="card-detail">{{ burrito.detail }}</p>
-            <a class="card-order" :href="instagram" target="_blank" rel="noopener noreferrer" :aria-label="`Pedir burrito ${burrito.name} por Instagram, $14.000`"><span>$14.000 <small>POR UNIDAD</small></span><span class="order-arrow" aria-hidden="true">↗</span></a>
+            <a class="card-order" :href="instagram" target="_blank" rel="noopener noreferrer" :aria-label="`Pedir burrito ${burrito.name} por Instagram, ${formattedPrice}`"><span>{{ formattedPrice }} <small>POR UNIDAD</small></span><span class="order-arrow" aria-hidden="true">↗</span></a>
           </article>
         </div>
         <div class="menu-bottom"><span>EL PLAN: PEDIR, ABRIR, NO COMPARTIR.</span><a :href="menuImage" target="_blank" rel="noopener noreferrer">Ver el menú original <span aria-hidden="true">↗</span></a></div>
