@@ -244,6 +244,17 @@
 import menuImage from "./assets/menu.jpg";
 import { siteInfo } from "#shared/utils/seo";
 
+useHead({
+  link: [
+    { rel: "preconnect", href: "https://fonts.googleapis.com" },
+    { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "anonymous" },
+    {
+      rel: "stylesheet",
+      href: "https://fonts.googleapis.com/css2?family=Anton&family=DM+Sans:wght@400;500;700;800;900&display=swap",
+    },
+  ],
+});
+
 const instagram = siteInfo.instagram;
 const unitPrice = 14000;
 const formattedPrice = new Intl.NumberFormat("es-AR", {
@@ -355,7 +366,7 @@ $navy: #142e55;
 $yellow: #fff3a3;
 $paper: #fff9da;
 $orange: #fa774c;
-$display: Impact, "Arial Narrow", "Arial Black", sans-serif;
+$display: "Anton", Impact, "Arial Narrow", "Arial Black", sans-serif;
 
 @layer reset, base, components, responsive;
 
@@ -408,7 +419,7 @@ $display: Impact, "Arial Narrow", "Arial Black", sans-serif;
   body {
     background: var(--blue);
     color: var(--yellow);
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: "DM Sans", Arial, Helvetica, sans-serif;
     font-size: 1rem;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
