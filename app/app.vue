@@ -852,6 +852,7 @@ $display: Impact, "Arial Narrow", "Arial Black", sans-serif;
   .delivery-copy h2 span {
     color: transparent;
     -webkit-text-stroke: 1px var(--yellow);
+    font-family: Arial, sans-serif;
   }
   .delivery-copy > p:not(.eyebrow) {
     margin-top: 1.5rem;
