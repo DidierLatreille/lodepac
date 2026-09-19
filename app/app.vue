@@ -179,7 +179,7 @@
           <h2 id="delivery-title">VOS PONÉ<br /><span>EL HAMBRE.</span></h2>
           <p>
             Nosotros ponemos los burritos.<br />Escribinos, reservá el tuyo y
-            coordinamos la entrega...
+            coordinamos la entrega.
           </p>
           <a
             class="button"
@@ -852,7 +852,6 @@ $display: Impact, "Arial Narrow", "Arial Black", sans-serif;
   .delivery-copy h2 span {
     color: transparent;
     -webkit-text-stroke: 1px var(--yellow);
-    font-family: Arial, sans-serif;
   }
   .delivery-copy > p:not(.eyebrow) {
     margin-top: 1.5rem;
