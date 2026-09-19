@@ -20,12 +20,8 @@
           >@lodepac <span aria-hidden="true">↗</span></a
         >
       </nav>
-      <a
-        class="button button-small header-order"
-        :href="instagram"
-        target="_blank"
-        rel="noopener noreferrer"
-        >Pedí el tuyo <span aria-hidden="true">↗</span></a
+      <a class="button button-small header-order" href="#carrito"
+        >Tu carrito ({{ itemCount }}) <span aria-hidden="true">↓</span></a
       >
       <button
         class="mobile-toggle"
@@ -48,6 +44,7 @@
       >
         <a href="#burritos" @click="closeMenu">Los burritos</a
         ><a href="#delivery" @click="closeMenu">Cómo pedir</a
+        ><a href="#carrito" @click="closeMenu">Tu carrito ({{ itemCount }})</a
         ><a
           :href="instagram"
           target="_blank"
@@ -151,15 +148,14 @@
             </div>
             <p class="card-description">{{ burrito.description }}</p>
             <p class="card-detail">{{ burrito.detail }}</p>
-            <a
-              class="card-order"
-              :href="instagram"
-              target="_blank"
-              rel="noopener noreferrer"
-              :aria-label="`Pedir burrito ${burrito.name} por Instagram, ${formattedPrice}`"
-              ><span>{{ formattedPrice }} <small>POR UNIDAD</small></span
-              ><span class="order-arrow" aria-hidden="true">↗</span></a
-            >
+            <div class="card-order">
+              <span>{{ formattedPrice }} <small>POR UNIDAD</small></span>
+              <div class="quantity-controls" :aria-label="`Cantidad de ${menuNames[burrito.className]}`">
+                <button type="button" :aria-label="`Quitar un ${menuNames[burrito.className]}`" :disabled="!cart[burrito.className]" @click="changeQuantity(burrito.className, -1)">−</button>
+                <span aria-live="polite">{{ cart[burrito.className] }}</span>
+                <button type="button" :aria-label="`Agregar un ${menuNames[burrito.className]}`" @click="changeQuantity(burrito.className, 1)">+</button>
+              </div>
+            </div>
           </article>
         </div>
         <div class="menu-bottom">
@@ -167,6 +163,22 @@
           ><a :href="menuImage" target="_blank" rel="noopener noreferrer"
             >Ver el menú original <span aria-hidden="true">↗</span></a
           >
+        </div>
+      </section>
+      <section id="carrito" class="cart-section" aria-labelledby="cart-title">
+        <div>
+          <p class="eyebrow">TU PEDIDO</p>
+          <h2 id="cart-title">EL CARRITO.</h2>
+          <p v-if="!itemCount" class="cart-empty">Todavía no agregaste burritos. Elegí tus favoritos arriba.</p>
+          <div v-else class="cart-receipt">
+            <div v-for="item in cartItems" :key="item.id" class="cart-line">
+              <span>{{ item.quantity }} × {{ item.name }}</span>
+              <span>{{ formatPrice(item.subtotal) }}</span>
+            </div>
+            <div class="cart-total"><span>TOTAL ({{ itemCount }} {{ itemCount === 1 ? 'BURRITO' : 'BURRITOS' }})</span><strong>{{ formatPrice(total) }}</strong></div>
+          </div>
+          <a v-if="itemCount" class="button cart-checkout" :href="whatsappUrl" target="_blank" rel="noopener noreferrer">Finalizar por WhatsApp <span aria-hidden="true">↗</span></a>
+          <p v-if="itemCount" class="cart-note">Se abrirá WhatsApp con tu pedido listo para enviar. El local confirma disponibilidad y envío.</p>
         </div>
       </section>
       <section
@@ -181,13 +193,7 @@
             Nosotros ponemos los burritos.<br />Escribinos, reservá el tuyo y
             coordinamos la entrega.
           </p>
-          <a
-            class="button"
-            :href="instagram"
-            target="_blank"
-            rel="noopener noreferrer"
-            >Pedí por Instagram <span aria-hidden="true">↗</span></a
-          >
+          <a class="button" href="#carrito">Revisá tu carrito <span aria-hidden="true">↓</span></a>
         </div>
         <div class="delivery-ticket">
           <div class="ticket-heading">
@@ -246,6 +252,57 @@ const formattedPrice = new Intl.NumberFormat("es-AR", {
   maximumFractionDigits: 0,
 }).format(unitPrice);
 const mobileMenuOpen = ref(false);
+const menuNames = {
+  birria: "Burrito de birria",
+  korean: "Burrito Korean BBQ Chicken",
+  philly: "Burrito Philly Cheesesteak",
+} as const;
+type BurritoId = keyof typeof menuNames;
+type Cart = Record<BurritoId, number>;
+const cart = reactive<Cart>({ birria: 0, korean: 0, philly: 0 });
+const cartItems = computed(() =>
+  (Object.keys(menuNames) as BurritoId[])
+    .filter((id) => cart[id] > 0)
+    .map((id) => ({ id, name: menuNames[id], quantity: cart[id], subtotal: cart[id] * unitPrice })),
+);
+const itemCount = computed(() => cartItems.value.reduce((sum, item) => sum + item.quantity, 0));
+const total = computed(() => itemCount.value * unitPrice);
+const formatPrice = (price: number) => new Intl.NumberFormat("es-AR", {
+  style: "currency", currency: "ARS", maximumFractionDigits: 0,
+}).format(price);
+const whatsappUrl = computed(() => {
+  const lines = [
+    "Hola, Lo de Pac. Quiero hacer este pedido:",
+    "",
+    ...cartItems.value.map((item) => `${item.quantity} × ${item.name} — ${formatPrice(item.subtotal)}`),
+    "",
+    `Total: ${formatPrice(total.value)}`,
+    "¿Me confirman disponibilidad y costo de envío? Gracias.",
+  ];
+  return `https://wa.me/5491132711877?text=${encodeURIComponent(lines.join("\n"))}`;
+});
+
+function changeQuantity(id: BurritoId, amount: number) {
+  cart[id] = Math.min(99, Math.max(0, cart[id] + amount));
+}
+
+onMounted(() => {
+  try {
+    const saved = JSON.parse(sessionStorage.getItem("lodepac-cart") || "{}");
+    for (const id of Object.keys(menuNames) as BurritoId[]) {
+      if (Number.isSafeInteger(saved[id]) && saved[id] >= 0) cart[id] = Math.min(saved[id], 99);
+    }
+  } catch {
+    // A missing or invalid stored cart starts empty.
+  }
+  watch(cart, () => {
+    try {
+      sessionStorage.setItem("lodepac-cart", JSON.stringify(cart));
+    } catch {
+      // The cart stays usable if storage is unavailable.
+    }
+  }, { deep: true });
+});
 const burritos = [
   {
     number: "01",
@@ -277,17 +334,11 @@ const burritos = [
     detail: "Consultanos los ingredientes por Instagram.",
     className: "philly",
   },
-];
+ ] as const;
 
 function closeMenu() {
   mobileMenuOpen.value = false;
 }
-
-const menuNames = {
-  birria: "Burrito de birria",
-  korean: "Burrito Korean BBQ Chicken",
-  philly: "Burrito Philly Cheesesteak",
-} as const;
 
 useLandingSeo(
   burritos.map((burrito) => ({
@@ -827,6 +878,55 @@ $display: Impact, "Arial Narrow", "Arial Black", sans-serif;
     color: var(--yellow);
     transform: rotate(45deg);
   }
+  .quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 1.1rem;
+  }
+  .quantity-controls button {
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--blue);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--blue);
+    font-size: 1.5rem;
+    line-height: 1;
+  }
+  .quantity-controls button:hover:not(:disabled) {
+    background: var(--blue);
+    color: var(--yellow);
+  }
+  .quantity-controls button:disabled { opacity: 0.4; cursor: not-allowed; }
+  .cart-section {
+    max-width: 1600px;
+    margin: auto;
+    padding: 3rem 4.5% 5rem;
+  }
+  .cart-section > div {
+    max-width: 720px;
+  }
+  .cart-section h2 {
+    margin: 1rem 0 2rem;
+    font-size: clamp(3.5rem, 6vw, 6rem);
+  }
+  .cart-empty, .cart-note { color: var(--paper); }
+  .cart-receipt {
+    padding: 1.5rem 2rem;
+    background: var(--yellow);
+    color: var(--blue);
+  }
+  .cart-line, .cart-total {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem 0;
+  }
+  .cart-line { border-bottom: 1px solid #1f407533; }
+  .cart-total { margin-top: 0.5rem; font-weight: 800; }
+  .cart-checkout { margin-top: 1.5rem; }
+  .cart-note { margin-top: 1rem; font-size: 0.875rem; }
   .menu-bottom {
     display: flex;
     justify-content: space-between;
@@ -1144,6 +1244,8 @@ $display: Impact, "Arial Narrow", "Arial Black", sans-serif;
       flex-direction: column;
       gap: 1rem;
     }
+    .cart-section { padding: 2rem 6% 4rem; }
+    .cart-receipt { padding: 1rem; }
     .delivery-section {
       grid-template-columns: 1fr;
       gap: 3rem;
