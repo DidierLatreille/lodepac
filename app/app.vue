@@ -179,7 +179,7 @@
           <h2 id="delivery-title">VOS PONÉ<br /><span>EL HAMBRE.</span></h2>
           <p>
             Nosotros ponemos los burritos.<br />Escribinos, reservá el tuyo y
-            coordinamos la entrega.
+            coordinamos la entrega...
           </p>
           <a
             class="button"
