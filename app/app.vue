@@ -6,12 +6,16 @@
       <span>DE ZONA NORTE, CON TODO.</span
       ><span>DELIVERY JUE · VIE · SÁB / 20 A 23 H</span>
     </div>
-    <header class="site-header">
+    <header
+      class="site-header"
+      :class="{ 'is-hidden': headerHidden && !mobileMenuOpen && !cartOpen }"
+      @focusin="headerHidden = false"
+    >
       <a
         class="brand"
         href="#inicio"
         aria-label="Lo de Pac, inicio"
-        @click="closeMenu"
+        @click="closeMenu()"
         ><span>LO DE</span><strong>PAC</strong></a
       >
       <nav class="desktop-nav" aria-label="Navegación principal">
@@ -20,17 +24,18 @@
           >@lodepac <span aria-hidden="true">↗</span></a
         >
       </nav>
-      <a class="button button-small header-order" href="#carrito"
-        >Tu carrito ({{ itemCount }}) <span aria-hidden="true">↓</span></a
+      <a class="button button-small header-order" href="#burritos"
+        >Elegí el tuyo <span aria-hidden="true">↓</span></a
       >
       <button
+        ref="menuToggle"
         class="mobile-toggle"
         type="button"
         :aria-expanded="mobileMenuOpen"
         aria-controls="mobile-navigation"
         :aria-label="mobileMenuOpen ? 'Cerrar menú' : 'Abrir menú'"
         @click="mobileMenuOpen = !mobileMenuOpen"
-        @keydown.esc="closeMenu"
+        @keydown.esc="closeMenu(true)"
       >
         <span>{{ mobileMenuOpen ? "CERRAR" : "MENÚ" }}</span
         ><span aria-hidden="true">{{ mobileMenuOpen ? "×" : "+" }}</span>
@@ -40,16 +45,16 @@
         id="mobile-navigation"
         class="mobile-nav"
         aria-label="Navegación móvil"
-        @keydown.esc="closeMenu"
+        @keydown.esc="closeMenu(true)"
       >
-        <a href="#burritos" @click="closeMenu">Los burritos</a
-        ><a href="#delivery" @click="closeMenu">Cómo pedir</a
-        ><a href="#carrito" @click="closeMenu">Tu carrito ({{ itemCount }})</a
-        ><a
+        <a href="#burritos" @click="closeMenu()">Los burritos</a
+        ><a href="#delivery" @click="closeMenu()">Cómo pedir</a
+        ><button type="button" @click="openCart">Tu carrito ({{ itemCount }})</button>
+        <a
           :href="instagram"
           target="_blank"
           rel="noopener noreferrer"
-          @click="closeMenu"
+          @click="closeMenu()"
           >Pedir por Instagram ↗</a
         >
       </nav>
@@ -153,7 +158,7 @@
               <div class="quantity-controls" :aria-label="`Cantidad de ${menuNames[burrito.className]}`">
                 <button type="button" :aria-label="`Quitar un ${menuNames[burrito.className]}`" :disabled="!cart[burrito.className]" @click="changeQuantity(burrito.className, -1)">−</button>
                 <span aria-live="polite">{{ cart[burrito.className] }}</span>
-                <button type="button" :aria-label="`Agregar un ${menuNames[burrito.className]}`" @click="changeQuantity(burrito.className, 1)">+</button>
+                <button type="button" :aria-label="`Agregar un ${menuNames[burrito.className]}`" :disabled="cart[burrito.className] >= 99" @click="changeQuantity(burrito.className, 1)">+</button>
               </div>
             </div>
           </article>
@@ -163,22 +168,6 @@
           ><a :href="menuImage" target="_blank" rel="noopener noreferrer"
             >Ver el menú original <span aria-hidden="true">↗</span></a
           >
-        </div>
-      </section>
-      <section id="carrito" class="cart-section" aria-labelledby="cart-title">
-        <div>
-          <p class="eyebrow">TU PEDIDO</p>
-          <h2 id="cart-title">EL CARRITO.</h2>
-          <p v-if="!itemCount" class="cart-empty">Todavía no agregaste burritos. Elegí tus favoritos arriba.</p>
-          <div v-else class="cart-receipt">
-            <div v-for="item in cartItems" :key="item.id" class="cart-line">
-              <span>{{ item.quantity }} × {{ item.name }}</span>
-              <span>{{ formatPrice(item.subtotal) }}</span>
-            </div>
-            <div class="cart-total"><span>TOTAL ({{ itemCount }} {{ itemCount === 1 ? 'BURRITO' : 'BURRITOS' }})</span><strong>{{ formatPrice(total) }}</strong></div>
-          </div>
-          <a v-if="itemCount" class="button cart-checkout" :href="whatsappUrl" target="_blank" rel="noopener noreferrer">Finalizar por WhatsApp <span aria-hidden="true">↗</span></a>
-          <p v-if="itemCount" class="cart-note">Se abrirá WhatsApp con tu pedido listo para enviar. El local confirma disponibilidad y envío.</p>
         </div>
       </section>
       <section
@@ -193,7 +182,7 @@
             Nosotros ponemos los burritos.<br />Escribinos, reservá el tuyo y
             coordinamos la entrega.
           </p>
-          <a class="button" href="#carrito">Revisá tu carrito <span aria-hidden="true">↓</span></a>
+          <button class="button" type="button" @click="openCart">Revisá tu carrito <span aria-hidden="true">↗</span></button>
         </div>
         <div class="delivery-ticket">
           <div class="ticket-heading">
@@ -237,20 +226,81 @@
         ><a href="#inicio">VOLVER ARRIBA ↑</a>
       </div>
     </footer>
+    <button
+      ref="cartBubble"
+      class="cart-bubble"
+      type="button"
+      aria-haspopup="dialog"
+      aria-controls="cart-dialog"
+      :aria-expanded="cartOpen"
+      :aria-label="`Abrir carrito: ${itemCount} ${itemCount === 1 ? 'burrito' : 'burritos'}`"
+      @click="openCart"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M6 7h12l2 14H4L6 7Z" />
+        <path d="M9 8V6a3 3 0 0 1 6 0v2" />
+      </svg>
+      <span class="cart-bubble-count" aria-hidden="true">{{ itemCount }}</span>
+    </button>
+    <span class="sr-only" role="status">{{ cartStatus }}</span>
+    <dialog
+      id="cart-dialog"
+      ref="cartDialog"
+      class="cart-dialog"
+      aria-labelledby="cart-title"
+      @cancel.prevent="closeCart"
+      @close="onCartClosed"
+      @click.self="closeCart"
+    >
+      <div class="cart-panel">
+        <div class="cart-heading">
+          <div><p class="eyebrow">LO DE PAC / TU PEDIDO</p><h2 id="cart-title">ALTO CARRITO.</h2></div>
+          <button class="cart-close" type="button" aria-label="Cerrar carrito" autofocus @click="closeCart">×</button>
+        </div>
+        <div v-if="!itemCount" class="cart-empty">
+          <p>ACÁ FALTAN BURRITOS.</p>
+          <span>Elegí tus favoritos y armate alto pedido.</span>
+          <a class="button" href="#burritos" @click.prevent="browseMenu">Ver los burritos <span aria-hidden="true">↓</span></a>
+        </div>
+        <template v-else>
+          <div class="cart-items">
+            <div v-for="item in cartItems" :key="item.id" class="cart-line">
+              <div class="cart-item-info"><h3>{{ item.name }}</h3><span>{{ formattedPrice }} por unidad</span></div>
+              <button class="cart-remove" type="button" :aria-label="`Eliminar ${item.name} del carrito`" @click="removeItem(item.id)">Quitar</button>
+              <div class="quantity-controls" :aria-label="`Cantidad de ${item.name}`">
+                <button type="button" :aria-label="`Quitar un ${item.name}`" @click="changeQuantity(item.id, -1)">−</button>
+                <span>{{ item.quantity }}</span>
+                <button type="button" :aria-label="`Agregar un ${item.name}`" :disabled="item.quantity >= 99" @click="changeQuantity(item.id, 1)">+</button>
+              </div>
+              <strong class="cart-subtotal">{{ formatPrice(item.subtotal) }}</strong>
+            </div>
+          </div>
+          <div class="cart-summary">
+            <div class="cart-total"><span>Total · {{ itemCount }} {{ itemCount === 1 ? 'burrito' : 'burritos' }}</span><strong>{{ formatPrice(total) }}</strong></div>
+            <p class="cart-note">Envío a coordinar con el local.</p>
+            <a class="button cart-checkout" :href="whatsappUrl" target="_blank" rel="noopener noreferrer">Pedir por WhatsApp <span aria-hidden="true">↗</span></a>
+            <p class="cart-note">Tu pedido se abre listo para enviar. El local confirma disponibilidad y entrega.</p>
+          </div>
+        </template>
+      </div>
+    </dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import menuImage from "./assets/menu.jpg";
+import "./assets/fonts.css";
 import { siteInfo } from "#shared/utils/seo";
 
 useHead({
   link: [
-    { rel: "preconnect", href: "https://fonts.googleapis.com" },
-    { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "anonymous" },
     {
-      rel: "stylesheet",
-      href: "https://fonts.googleapis.com/css2?family=Anton&family=DM+Sans:wght@400;500;700;800;900&display=swap",
+      rel: "preload", href: "/fonts/barlow-condensed-900-latin.woff2",
+      as: "font", type: "font/woff2", crossorigin: "anonymous",
+    },
+    {
+      rel: "preload", href: "/fonts/dm-sans-variable-latin.woff2",
+      as: "font", type: "font/woff2", crossorigin: "anonymous",
     },
   ],
 });
@@ -263,6 +313,86 @@ const formattedPrice = new Intl.NumberFormat("es-AR", {
   maximumFractionDigits: 0,
 }).format(unitPrice);
 const mobileMenuOpen = ref(false);
+const menuToggle = ref<HTMLButtonElement | null>(null);
+const headerHidden = ref(false);
+const cartDialog = ref<HTMLDialogElement | null>(null);
+const cartBubble = ref<HTMLButtonElement | null>(null);
+const cartOpen = ref(false);
+const cartStatus = ref("");
+let lastScrollY = 0;
+let scrollTravel = 0;
+let scrollFrame = 0;
+let returnFocus: HTMLElement | null = null;
+let browseAfterClose = false;
+let unlockPage: (() => void) | undefined;
+let desktopViewport: MediaQueryList | undefined;
+
+function onViewportChange() {
+  if (desktopViewport?.matches) closeMenu();
+}
+
+function onPageScroll() {
+  if (scrollFrame || cartOpen.value) return;
+  scrollFrame = requestAnimationFrame(() => {
+    scrollFrame = 0;
+    if (cartOpen.value) return;
+    // Clamp elastic overscroll on mobile so bouncing at the bottom doesn't toggle the nav.
+    const y = Math.max(0, Math.min(window.scrollY, document.documentElement.scrollHeight - window.innerHeight));
+    const delta = y - lastScrollY;
+    scrollTravel = Math.sign(delta) === Math.sign(scrollTravel) ? scrollTravel + delta : delta;
+    if (y < 140 || mobileMenuOpen.value) headerHidden.value = false;
+    else if (Math.abs(scrollTravel) >= 10) headerHidden.value = scrollTravel > 0;
+    lastScrollY = y;
+  });
+}
+
+function openCart() {
+  if (!cartDialog.value || cartOpen.value) return;
+  returnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  closeMenu();
+  cartOpen.value = true;
+  const y = window.scrollY;
+  const bodyStyle = document.body.style;
+  const previous = { position: bodyStyle.position, top: bodyStyle.top, width: bodyStyle.width, overflow: bodyStyle.overflow };
+  Object.assign(bodyStyle, { position: "fixed", top: `-${y}px`, width: "100%", overflow: "hidden" });
+  unlockPage = () => {
+    Object.assign(bodyStyle, previous);
+    const rootStyle = document.documentElement.style;
+    const behavior = rootStyle.scrollBehavior;
+    rootStyle.scrollBehavior = "auto";
+    window.scrollTo(0, y);
+    rootStyle.scrollBehavior = behavior;
+    lastScrollY = y;
+    scrollTravel = 0;
+  };
+  cartDialog.value.showModal();
+}
+
+function closeCart() {
+  cartDialog.value?.close();
+}
+
+function onCartClosed() {
+  unlockPage?.();
+  unlockPage = undefined;
+  cartOpen.value = false;
+  const target = returnFocus?.isConnected ? returnFocus : cartBubble.value;
+  target?.focus({ preventScroll: true });
+  if (browseAfterClose) {
+    browseAfterClose = false;
+    document.getElementById("burritos")?.scrollIntoView();
+  }
+}
+
+function browseMenu() {
+  browseAfterClose = true;
+  closeCart();
+}
+
+function onPagePointerDown(event: PointerEvent) {
+  if (mobileMenuOpen.value && event.target instanceof Element && !event.target.closest(".site-header")) closeMenu();
+}
+
 const menuNames = {
   birria: "Burrito de birria",
   korean: "Burrito Korean BBQ Chicken",
@@ -295,9 +425,20 @@ const whatsappUrl = computed(() => {
 
 function changeQuantity(id: BurritoId, amount: number) {
   cart[id] = Math.min(99, Math.max(0, cart[id] + amount));
+  cartStatus.value = `${menuNames[id]}: ${cart[id]}. ${itemCount.value} burritos en tu carrito.`;
+  if (cartOpen.value && !cart[id]) nextTick(() => cartDialog.value?.querySelector<HTMLButtonElement>(".cart-close")?.focus());
+}
+
+function removeItem(id: BurritoId) {
+  changeQuantity(id, -cart[id]);
 }
 
 onMounted(() => {
+  lastScrollY = window.scrollY;
+  window.addEventListener("scroll", onPageScroll, { passive: true });
+  document.addEventListener("pointerdown", onPagePointerDown);
+  desktopViewport = window.matchMedia("(min-width: 761px)");
+  desktopViewport.addEventListener("change", onViewportChange);
   try {
     const saved = JSON.parse(sessionStorage.getItem("lodepac-cart") || "{}");
     for (const id of Object.keys(menuNames) as BurritoId[]) {
@@ -313,6 +454,14 @@ onMounted(() => {
       // The cart stays usable if storage is unavailable.
     }
   }, { deep: true });
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("scroll", onPageScroll);
+  document.removeEventListener("pointerdown", onPagePointerDown);
+  desktopViewport?.removeEventListener("change", onViewportChange);
+  cancelAnimationFrame(scrollFrame);
+  unlockPage?.();
 });
 const burritos = [
   {
@@ -347,8 +496,9 @@ const burritos = [
   },
  ] as const;
 
-function closeMenu() {
+function closeMenu(restoreFocus = false) {
   mobileMenuOpen.value = false;
+  if (restoreFocus) menuToggle.value?.focus();
 }
 
 useLandingSeo(
@@ -366,7 +516,7 @@ $navy: #142e55;
 $yellow: #fff3a3;
 $paper: #fff9da;
 $orange: #fa774c;
-$display: "Anton", Impact, "Arial Narrow", "Arial Black", sans-serif;
+$display: "Barlow Condensed", sans-serif;
 
 @layer reset, base, components, responsive;
 
@@ -411,15 +561,17 @@ $display: "Anton", Impact, "Arial Narrow", "Arial Black", sans-serif;
     --paper: #{$paper};
     --orange: #{$orange};
     --display: #{$display};
+    --body-font: "DM Sans", sans-serif;
   }
   html {
     scroll-behavior: smooth;
-    scroll-padding-top: 2rem;
+    scroll-padding-top: 8rem;
+    scrollbar-gutter: stable;
   }
   body {
     background: var(--blue);
     color: var(--yellow);
-    font-family: "DM Sans", Arial, Helvetica, sans-serif;
+    font-family: var(--body-font);
     font-size: 1rem;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
@@ -434,11 +586,20 @@ $display: "Anton", Impact, "Arial Narrow", "Arial Black", sans-serif;
   }
   h1,
   h2,
-  h3 {
+  h3,
+  .brand strong,
+  .hero-sticker strong,
+  .flavor-track span,
+  .ticket-end,
+  .footer-wordmark {
     font-family: var(--display);
     font-weight: 900;
+  }
+  h1,
+  h2,
+  h3 {
     line-height: 0.98;
-    letter-spacing: -0.025em;
+    letter-spacing: -0.015em;
   }
   a,
   button {
@@ -447,9 +608,20 @@ $display: "Anton", Impact, "Arial Narrow", "Arial Black", sans-serif;
 }
 
 @layer components {
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
   .skip-link {
     position: fixed;
-    z-index: 20;
+    z-index: 60;
     padding: 1rem;
     top: -6rem;
     left: 1rem;
@@ -471,16 +643,31 @@ $display: "Anton", Impact, "Arial Narrow", "Arial Black", sans-serif;
     letter-spacing: 0.08em;
   }
   .site-header {
-    position: relative;
-    max-width: 1600px;
-    margin: auto;
+    position: sticky;
+    top: 0.75rem;
+    z-index: 40;
+    width: calc(100% - 3rem);
+    max-width: 1456px;
+    margin: 0.75rem auto;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1.5rem 4.5%;
-    border-bottom: 1px solid #fff3a333;
+    gap: clamp(0.75rem, 1.5vw, 1.5rem);
+    padding: 1rem 1.5rem;
+    border: 1px solid #fff3a338;
+    border-radius: 24px;
+    background: #142e55f5;
+    box-shadow: 0 12px 32px #071a3426, inset 0 1px 0 #ffffff14;
+    transition: transform 0.25s ease;
+  }
+  .site-header.is-hidden {
+    transform: translateY(calc(-100% - 1.5rem));
+  }
+  .site-header:has(:focus-visible) {
+    transform: none;
   }
   .brand {
+    flex-shrink: 0;
     width: 74px;
     line-height: 0.9;
     text-align: center;
@@ -500,7 +687,7 @@ $display: "Anton", Impact, "Arial Narrow", "Arial Black", sans-serif;
   }
   .desktop-nav {
     display: flex;
-    gap: 2.5rem;
+    gap: clamp(1rem, 2vw, 2.5rem);
     font-size: 0.9rem;
     font-weight: 700;
   }
@@ -588,8 +775,8 @@ $display: "Anton", Impact, "Arial Narrow", "Arial Black", sans-serif;
     font-size: clamp(4.2rem, 7.7vw, 8.7rem);
   }
   .hero h1 > span {
-    color: transparent;
-    -webkit-text-stroke: 1.5px var(--yellow);
+    color: var(--orange);
+    text-shadow: 0.025em 0.025em 0 var(--navy), 0.055em 0.055em 0 var(--yellow);
   }
   .hero-description {
     margin-top: 1.6rem;
@@ -633,8 +820,7 @@ $display: "Anton", Impact, "Arial Narrow", "Arial Black", sans-serif;
     font-weight: 700;
   }
   .hero-caption em {
-    font-family: Georgia, serif;
-    font-weight: 400;
+    font-weight: 500;
   }
   .food-wrap {
     position: absolute;
@@ -755,11 +941,8 @@ $display: "Anton", Impact, "Arial Narrow", "Arial Black", sans-serif;
     margin-top: 1.2rem;
   }
   .section-heading h2 span {
-    font-family: Georgia, serif;
-    font-style: italic;
-    font-weight: 400;
-    font-size: 0.9em;
-    letter-spacing: -0.06em;
+    color: var(--orange);
+    text-shadow: 0.025em 0.025em 0 var(--navy), 0.055em 0.055em 0 var(--yellow);
   }
   .section-heading > p {
     max-width: 22rem;
@@ -828,8 +1011,8 @@ $display: "Anton", Impact, "Arial Narrow", "Arial Black", sans-serif;
     letter-spacing: 0;
   }
   .card-subtitle {
-    font-family: Georgia, serif;
     font-style: italic;
+    font-weight: 500;
     font-size: 1.25rem;
   }
   .card-tags {
@@ -861,6 +1044,7 @@ $display: "Anton", Impact, "Arial Narrow", "Arial Black", sans-serif;
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
+    flex-wrap: wrap;
     border-top: 1px solid #1f407550;
     padding-top: 1rem;
     font-size: 1.7rem;
@@ -894,6 +1078,12 @@ $display: "Anton", Impact, "Arial Narrow", "Arial Black", sans-serif;
     align-items: center;
     gap: 0.8rem;
     font-size: 1.1rem;
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+  }
+  .quantity-controls > span {
+    min-width: 2ch;
+    text-align: center;
   }
   .quantity-controls button {
     width: 44px;
@@ -910,34 +1100,125 @@ $display: "Anton", Impact, "Arial Narrow", "Arial Black", sans-serif;
     color: var(--yellow);
   }
   .quantity-controls button:disabled { opacity: 0.4; cursor: not-allowed; }
-  .cart-section {
-    max-width: 1600px;
+  .cart-bubble {
+    position: fixed;
+    z-index: 45;
+    right: max(1.5rem, env(safe-area-inset-right));
+    bottom: calc(1.5rem + env(safe-area-inset-bottom));
+    display: grid;
+    place-items: center;
+    width: 68px;
+    height: 68px;
+    border: 1px solid #fff3a380;
+    border-radius: 50%;
+    color: var(--yellow);
+    background: #142e55f5;
+    box-shadow: 0 8px 30px #071a3459, inset 0 1px 0 #ffffff33;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .cart-bubble:hover { transform: translateY(-3px); box-shadow: 0 12px 36px #071a3477; }
+  .cart-bubble svg { width: 29px; height: 29px; }
+  .cart-bubble-count {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    display: grid;
+    place-items: center;
+    min-width: 28px;
+    height: 28px;
+    padding: 0 5px;
+    border: 2px solid var(--blue);
+    border-radius: 20px;
+    background: var(--orange);
+    color: var(--navy);
+    font-size: 0.875rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+  }
+  .cart-dialog {
+    position: fixed;
+    inset: 0;
+    width: min(560px, calc(100% - 2rem));
+    max-width: none;
+    max-height: 88vh;
+    max-height: 88dvh;
+    padding: 0;
     margin: auto;
-    padding: 3rem 4.5% 5rem;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border: 1px solid #fff3a345;
+    border-radius: 28px;
+    color: var(--yellow);
+    background: #142e55fa;
+    box-shadow: 0 24px 90px #071a3488, inset 0 1px 0 #ffffff1f;
   }
-  .cart-section > div {
-    max-width: 720px;
-  }
-  .cart-section h2 {
-    margin: 1rem 0 2rem;
-    font-size: clamp(3.5rem, 6vw, 6rem);
-  }
-  .cart-empty, .cart-note { color: var(--paper); }
-  .cart-receipt {
-    padding: 1.5rem 2rem;
-    background: var(--yellow);
-    color: var(--blue);
-  }
-  .cart-line, .cart-total {
+  .cart-dialog::backdrop { background: #061327a8; }
+  .cart-dialog[open] { animation: cart-appear 0.2s ease-out; }
+  .cart-panel { padding: 1.75rem; }
+  .cart-heading {
     display: flex;
     justify-content: space-between;
+    align-items: flex-start;
     gap: 1rem;
-    padding: 0.75rem 0;
+    margin-bottom: 1.75rem;
   }
-  .cart-line { border-bottom: 1px solid #1f407533; }
-  .cart-total { margin-top: 0.5rem; font-weight: 800; }
-  .cart-checkout { margin-top: 1.5rem; }
-  .cart-note { margin-top: 1rem; font-size: 0.875rem; }
+  .cart-heading .eyebrow { font-size: 0.75rem; }
+  .cart-heading h2 { margin-top: 0.5rem; font-size: clamp(2.25rem, 7vw, 3rem); }
+  .cart-close {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border: 1px solid #fff3a355;
+    border-radius: 50%;
+    background: #ffffff0d;
+    color: var(--yellow);
+    font-size: 1.75rem;
+    line-height: 1;
+  }
+  .cart-empty { display: grid; gap: 1rem; padding: 1rem 0; }
+  .cart-empty > p { font-family: var(--display); font-size: 2rem; font-weight: 800; }
+  .cart-empty > span, .cart-note { color: var(--paper); }
+  .cart-empty .button { margin-top: 1rem; }
+  .cart-line {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1rem;
+    align-items: center;
+    padding: 1.25rem 0;
+    border-top: 1px solid #fff3a333;
+  }
+  .cart-item-info h3 { font-family: var(--body-font); font-size: 1rem; font-weight: 800; line-height: 1.4; }
+  .cart-item-info > span { display: block; margin-top: 0.25rem; color: var(--paper); font-size: 0.875rem; }
+  .cart-remove {
+    min-height: 44px;
+    padding: 0.5rem;
+    border: 0;
+    background: transparent;
+    color: var(--paper);
+    font-size: 0.875rem;
+    text-decoration: underline;
+    text-underline-offset: 0.25rem;
+  }
+  .cart-dialog .quantity-controls button { color: var(--yellow); border-color: #fff3a366; background: #ffffff0d; }
+  .cart-dialog .quantity-controls button:hover:not(:disabled), .cart-close:hover { background: var(--yellow); color: var(--blue); }
+  .cart-subtotal { justify-self: end; font-variant-numeric: tabular-nums; }
+  .cart-summary { padding-top: 1.25rem; border-top: 1px dashed #fff3a355; }
+  .cart-total { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem 1rem; font-weight: 800; }
+  .cart-total strong { font-size: 1.75rem; font-variant-numeric: tabular-nums; }
+  .cart-checkout { width: 100%; margin-top: 1.25rem; gap: 1rem; }
+  .cart-note { margin-top: 0.65rem; font-size: 0.875rem; }
+  @keyframes cart-appear {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @supports ((backdrop-filter: blur(16px)) or (-webkit-backdrop-filter: blur(16px))) {
+    .site-header, .cart-bubble, .cart-dialog {
+      background: linear-gradient(135deg, #ffffff0d, #ffffff00), #142e55d9;
+      -webkit-backdrop-filter: blur(18px);
+      backdrop-filter: blur(18px);
+    }
+  }
   .menu-bottom {
     display: flex;
     justify-content: space-between;
@@ -961,8 +1242,8 @@ $display: "Anton", Impact, "Arial Narrow", "Arial Black", sans-serif;
     align-items: center;
   }
   .delivery-copy h2 span {
-    color: transparent;
-    -webkit-text-stroke: 1px var(--yellow);
+    color: var(--orange);
+    text-shadow: 0.025em 0.025em 0 var(--navy), 0.055em 0.055em 0 var(--yellow);
   }
   .delivery-copy > p:not(.eyebrow) {
     margin-top: 1.5rem;
@@ -1028,7 +1309,7 @@ $display: "Anton", Impact, "Arial Narrow", "Arial Black", sans-serif;
     font-size: 1.75rem;
   }
   .site-footer {
-    padding: 3rem 4.5% 1.5rem;
+    padding: 3rem 4.5% calc(7rem + env(safe-area-inset-bottom));
     background: var(--yellow);
     color: var(--blue);
     overflow: hidden;
@@ -1045,7 +1326,7 @@ $display: "Anton", Impact, "Arial Narrow", "Arial Black", sans-serif;
   }
   .footer-wordmark > span {
     display: inline-block;
-    font-family: Arial, sans-serif;
+    font-family: var(--body-font);
     font-size: 0.13em;
     vertical-align: top;
     margin: 0.5em 0 0 0.5em;
@@ -1115,7 +1396,11 @@ $display: "Anton", Impact, "Arial Narrow", "Arial Black", sans-serif;
       display: none;
     }
     .site-header {
-      padding: 1.2rem 6%;
+      top: 0.5rem;
+      width: calc(100% - 1.5rem);
+      margin-block: 0.5rem;
+      padding: 0.85rem 1rem;
+      border-radius: 20px;
     }
     .brand {
       width: 55px;
@@ -1150,7 +1435,7 @@ $display: "Anton", Impact, "Arial Narrow", "Arial Black", sans-serif;
     .mobile-nav {
       display: flex;
       position: absolute;
-      top: 100%;
+      top: calc(100% + 0.5rem);
       left: 0;
       right: 0;
       z-index: 10;
@@ -1158,11 +1443,19 @@ $display: "Anton", Impact, "Arial Narrow", "Arial Black", sans-serif;
       gap: 0.5rem;
       padding: 1rem 6% 1.5rem;
       background: var(--navy);
-      box-shadow: 0 6px 12px #142e5533;
+      border: 1px solid #fff3a338;
+      border-radius: 20px;
+      max-height: calc(100dvh - 9rem);
+      overflow-y: auto;
+      box-shadow: 0 12px 32px #071a3440;
     }
-    .mobile-nav a {
+    .mobile-nav a, .mobile-nav button {
       padding: 0.75rem 0;
       font-weight: 700;
+      text-align: left;
+      border: 0;
+      color: inherit;
+      background: none;
     }
     .hero {
       padding: 2rem 6% 1.25rem;
@@ -1255,8 +1548,22 @@ $display: "Anton", Impact, "Arial Narrow", "Arial Black", sans-serif;
       flex-direction: column;
       gap: 1rem;
     }
-    .cart-section { padding: 2rem 6% 4rem; }
-    .cart-receipt { padding: 1rem; }
+    .cart-bubble {
+      width: 60px;
+      height: 60px;
+      right: max(1rem, env(safe-area-inset-right));
+      bottom: calc(1rem + env(safe-area-inset-bottom));
+    }
+    .cart-dialog {
+      inset: auto 0 0;
+      width: 100%;
+      max-height: 90vh;
+      max-height: 90dvh;
+      margin: 0 auto;
+      border-radius: 24px 24px 0 0;
+      border-bottom: 0;
+    }
+    .cart-panel { padding: 1.25rem max(1.25rem, env(safe-area-inset-right)) calc(1.5rem + env(safe-area-inset-bottom)) max(1.25rem, env(safe-area-inset-left)); }
     .delivery-section {
       grid-template-columns: 1fr;
       gap: 3rem;
@@ -1274,7 +1581,7 @@ $display: "Anton", Impact, "Arial Narrow", "Arial Black", sans-serif;
       grid-template-columns: 1fr 1.7fr;
     }
     .site-footer {
-      padding: 2rem 6% 1.5rem;
+      padding: 2rem 6% calc(6.5rem + env(safe-area-inset-bottom));
     }
     .footer-wordmark {
       font-size: 17.8vw;
