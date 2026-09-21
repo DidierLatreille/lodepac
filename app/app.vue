@@ -650,7 +650,7 @@ $display: "Barlow Condensed", sans-serif;
     z-index: 40;
     width: calc(100% - 3rem);
     max-width: 1456px;
-    margin: 0.75rem auto;
+    margin: 2rem auto 0rem auto;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1419,6 +1419,8 @@ $display: "Barlow Condensed", sans-serif;
       margin-block: 0.5rem;
       padding: 0.85rem 1rem;
       border-radius: 20px;
+      margin-top: 1.25rem;
+      margin-bottom: 0rem;
     }
     .brand {
       width: 55px;
@@ -1476,7 +1478,7 @@ $display: "Barlow Condensed", sans-serif;
       background: none;
     }
     .hero {
-      padding: 2rem 6% 1.25rem;
+      padding: 1.35rem 6% 1.25rem;
       grid-template-columns: minmax(0, 1fr);
     }
     .hero h1 {
