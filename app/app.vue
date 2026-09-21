@@ -63,7 +63,7 @@
       <section id="inicio" class="hero" aria-labelledby="hero-title">
         <div class="hero-copy">
           <p class="eyebrow">
-            <span class="little-star" aria-hidden="true">✳</span> LO DE PAC ·
+            <span class="little-star" aria-hidden="true">&#10035;&#65038;</span> LO DE PAC ·
             BURRITOS EN ZONA NORTE
           </p>
           <h1 id="hero-title">
@@ -114,10 +114,11 @@
       </section>
       <div class="flavor-strip" aria-hidden="true">
         <div class="flavor-track">
-          <span>BIRRIA</span><b>✳</b><span>KOREAN BBQ</span><b>✳</b
-          ><span>PHILLY CHEESESTEAK</span><b>✳</b><span>BIRRIA</span><b>✳</b
-          ><span>KOREAN BBQ</span><b>✳</b><span>PHILLY CHEESESTEAK</span
-          ><b>✳</b>
+          <div v-for="copy in 2" :key="copy" class="flavor-group">
+            <template v-for="flavor in stripFlavors" :key="flavor">
+              <span>{{ flavor }}</span><b>&#10035;&#65038;</b>
+            </template>
+          </div>
         </div>
       </div>
       <section id="burritos" class="menu-section" aria-labelledby="menu-title">
@@ -140,7 +141,7 @@
           >
             <div class="card-top">
               <span>{{ burrito.number }} / EL MENÚ</span
-              ><span class="card-star" aria-hidden="true">✳</span>
+              ><span class="card-star" aria-hidden="true">&#10035;&#65038;</span>
             </div>
             <h3>
               {{ burrito.name
@@ -207,7 +208,7 @@
             envío al pedir.
           </p>
           <div class="ticket-end">
-            <span>BUEN BAJÓN.</span><span aria-hidden="true">✳ ✳ ✳</span>
+            <span>BUEN BAJÓN.</span><span aria-hidden="true">&#10035;&#65038; &#10035;&#65038; &#10035;&#65038;</span>
           </div>
         </div>
       </section>
@@ -217,7 +218,7 @@
         class="footer-wordmark"
         href="#inicio"
         aria-label="Lo de Pac, volver al inicio"
-        >LO DE PAC<span aria-hidden="true">✳</span></a
+        >LO DE PAC<span aria-hidden="true">&#10035;&#65038;</span></a
       >
       <div class="footer-bottom">
         <span>BURRITOS CON AGUANTE. ZONA NORTE.</span
@@ -306,6 +307,7 @@ useHead({
 });
 
 const instagram = siteInfo.instagram;
+const stripFlavors = ["BIRRIA", "KOREAN BBQ", "PHILLY CHEESESTEAK", "BIRRIA", "KOREAN BBQ", "PHILLY CHEESESTEAK"] as const;
 const unitPrice = 14000;
 const formattedPrice = new Intl.NumberFormat("es-AR", {
   style: "currency",
@@ -754,7 +756,7 @@ $display: "Barlow Condensed", sans-serif;
     padding: 3rem 4.5% 1.5rem;
     position: relative;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     column-gap: 1rem;
     overflow: clip;
   }
@@ -805,6 +807,7 @@ $display: "Barlow Condensed", sans-serif;
   }
   .hero-art {
     position: relative;
+    width: 100%;
     min-width: 0;
     min-height: 620px;
     align-self: stretch;
@@ -900,6 +903,7 @@ $display: "Barlow Condensed", sans-serif;
     gap: 1.5rem;
   }
   .flavor-strip {
+    --flavor-gap: 2rem;
     overflow: hidden;
     padding-block: 0.9rem;
     margin-top: 1.5rem;
@@ -910,8 +914,22 @@ $display: "Barlow Condensed", sans-serif;
   .flavor-track {
     display: flex;
     width: max-content;
-    gap: 2rem;
+    animation: flavor-scroll 26s linear infinite;
+  }
+  .flavor-group {
+    display: flex;
+    flex-shrink: 0;
+    min-width: 100vw;
+    gap: var(--flavor-gap);
+    padding-right: var(--flavor-gap);
     align-items: center;
+    justify-content: space-around;
+    white-space: nowrap;
+  }
+  /* Identical groups include their trailing gap, keeping the loop seamless. */
+  @keyframes flavor-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
   }
   .flavor-track span {
     font-family: var(--display);
@@ -1459,7 +1477,7 @@ $display: "Barlow Condensed", sans-serif;
     }
     .hero {
       padding: 2rem 6% 1.25rem;
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
     }
     .hero h1 {
       margin-top: 1.2rem;
@@ -1474,7 +1492,13 @@ $display: "Barlow Condensed", sans-serif;
     .hero-art {
       margin-top: 2rem;
       min-height: 0;
-      aspect-ratio: 1 / 1.13;
+    }
+    .hero-art::before {
+      /* Reserve height in normal flow: Safari can collapse an empty grid item
+         whose size depends only on aspect-ratio and absolute children. */
+      content: "";
+      display: block;
+      padding-top: 113%;
     }
     .hero-caption {
       top: 0;
@@ -1513,8 +1537,8 @@ $display: "Barlow Condensed", sans-serif;
     .flavor-track span {
       font-size: 1.8rem;
     }
-    .flavor-track {
-      gap: 1.5rem;
+    .flavor-strip {
+      --flavor-gap: 1.5rem;
     }
     .menu-section {
       padding: 3.5rem 6% 2rem;

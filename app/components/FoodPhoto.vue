@@ -30,11 +30,21 @@ const photos = {
 
 <style scoped>
 .food-photo {
+  position: relative;
   width: 100%;
-  aspect-ratio: 520 / 345;
+}
+
+.food-photo::before {
+  content: '';
+  display: block;
+  padding-top: calc(345 / 520 * 100%);
 }
 
 .food-photo img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: contain;
