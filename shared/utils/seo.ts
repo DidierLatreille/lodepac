@@ -4,6 +4,9 @@ export const siteInfo = {
   description: 'Pedí burritos de birria, Korean BBQ Chicken y Philly Cheesesteak en Lo de Pac. Delivery en Vicente López y Martínez, jueves a sábados de 20 a 23 h.',
   language: 'es-AR',
   instagram: 'https://www.instagram.com/lodepac/',
+  googleMaps: 'https://www.google.com/maps?cid=6502303075585035578',
+  googleReviews: 'https://www.google.com/search?q=lo+de+pac#lrd=0x95bcb1fb5c75629b:0x5a3cd232522d0d3a,1,,,,',
+  googleWriteReview: 'https://www.google.com/search?q=lo+de+pac#lrd=0x95bcb1fb5c75629b:0x5a3cd232522d0d3a,3,,,,',
 } as const
 
 /** Only an explicitly configured production origin can become canonical. */

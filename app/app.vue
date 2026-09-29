@@ -212,6 +212,7 @@
           </div>
         </div>
       </section>
+      <CustomerReviews />
     </main>
     <footer class="site-footer">
       <a
@@ -222,9 +223,12 @@
       >
       <div class="footer-bottom">
         <span>BURRITOS CON AGUANTE. ZONA NORTE.</span
-        ><a :href="instagram" target="_blank" rel="noopener noreferrer"
-          >@lodepac <span aria-hidden="true">↗</span></a
-        ><a href="#inicio">VOLVER ARRIBA ↑</a>
+        >
+        <div class="footer-socials" aria-label="Encontranos en redes y Google">
+          <a class="social-button" :href="instagram" target="_blank" rel="noopener noreferrer"><SocialIcon name="instagram" /> Instagram <span aria-hidden="true">↗</span></a>
+          <a class="social-button" :href="siteInfo.googleMaps" target="_blank" rel="noopener noreferrer"><SocialIcon name="google" /> Google <span aria-hidden="true">↗</span></a>
+        </div>
+        <a href="#inicio">VOLVER ARRIBA ↑</a>
       </div>
     </footer>
     <button
@@ -1348,6 +1352,24 @@ $display: "Barlow Condensed", sans-serif;
     font-size: 0.13em;
     vertical-align: top;
     margin: 0.5em 0 0 0.5em;
+  }
+  .footer-socials { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+  .social-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 48px;
+    padding: 0.75rem 1.1rem;
+    border: 2px solid var(--blue);
+    border-radius: 100px;
+    font-size: 0.875rem;
+    transition: background 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s;
+  }
+  .social-button:hover, .social-button:focus-visible {
+    background: var(--blue);
+    color: var(--yellow);
+    transform: translateY(-3px);
+    box-shadow: 3px 4px 0 var(--orange);
   }
   .footer-bottom {
     margin-top: 2rem;
