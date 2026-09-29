@@ -70,7 +70,7 @@
             POCO<br />CHAMUYO.<br /><span>MUCHO</span><br />RELLENO.
           </h1>
           <p class="hero-description">
-            Burritos con delivery en Vicente López y Martínez.<br />Cocción
+            Burritos con delivery en Zona Norte<br />Cocción
             lenta. Queso sin miedo.
           </p>
           <div class="hero-actions">
@@ -106,7 +106,7 @@
           <span class="photo-footnote">FOTOS REALES. HAMBRE REAL.</span>
         </div>
         <div class="hero-bottom">
-          <span>VICENTE LÓPEZ + MARTÍNEZ</span
+          <span>ZONA NORTE</span
           ><a href="#burritos"
             >SEGUÍ BAJANDO <span aria-hidden="true">↓</span></a
           >
@@ -192,7 +192,7 @@
           <dl>
             <div>
               <dt>POR DÓNDE</dt>
-              <dd>Vicente López<br />y Martínez</dd>
+              <dd>Todo Zona Norte</dd>
             </div>
             <div>
               <dt>CUÁNDO</dt>
