@@ -24,7 +24,7 @@
           >@lodepac <span aria-hidden="true">↗</span></a
         >
       </nav>
-      <a class="button button-small header-order" href="#burritos"
+      <a class="button button-2 button-small header-order" href="#burritos"
         >Elegí el tuyo <span aria-hidden="true">↓</span></a
       >
       <button
@@ -74,7 +74,7 @@
             lenta. Queso sin miedo.
           </p>
           <div class="hero-actions">
-            <a class="button" href="#burritos"
+            <a class="button button-2" href="#burritos"
               >Elegí tu burrito <span aria-hidden="true">↓</span></a
             ><span class="price-note"
               >{{ formattedPrice }} <small>POR UNIDAD</small></span
@@ -166,9 +166,9 @@
         </div>
         <div class="menu-bottom">
           <span>EL PLAN: PEDIR, ABRIR, NO COMPARTIR.</span
-          ><a :href="menuImage" target="_blank" rel="noopener noreferrer"
-            >Ver el menú original <span aria-hidden="true">↗</span></a
-          >
+          ><button class="button button-2" @click="openCart">
+            <a >Abrir Carrito <span aria-hidden="true">↗</span></a
+          ></button>
         </div>
       </section>
       <section
@@ -183,7 +183,7 @@
             Nosotros ponemos los burritos.<br />Escribinos, reservá el tuyo y
             coordinamos la entrega.
           </p>
-          <button class="button" type="button" @click="openCart">Revisá tu carrito <span aria-hidden="true">↗</span></button>
+          <button class="button button-2" type="button" @click="openCart">Revisá tu carrito <span aria-hidden="true">↗</span></button>
         </div>
         <div class="delivery-ticket">
           <div class="ticket-heading">
@@ -750,6 +750,15 @@ $display: "Barlow Condensed", sans-serif;
     font-size: 0.875rem;
     gap: 1.5rem;
   }
+
+  .button-2{
+    background: var(--yellow); border-color: var(--yellow);
+
+    &:hover{
+      background: var(--orange); border-color: var(--orange);
+    }
+  }
+
   .mobile-toggle,
   .mobile-nav {
     display: none;
@@ -1248,11 +1257,9 @@ $display: "Barlow Condensed", sans-serif;
     padding-top: 1.5rem;
     font-size: 0.75rem;
     letter-spacing: 0.04em;
+    align-items: center;
   }
-  .menu-bottom a {
-    text-decoration: underline;
-    text-underline-offset: 0.3rem;
-  }
+
   .delivery-section {
     border-top: 1px solid #fff3a344;
     padding: 5rem 4.5% 6rem;
