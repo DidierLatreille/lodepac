@@ -228,7 +228,10 @@
           <a class="social-button" :href="instagram" target="_blank" rel="noopener noreferrer"><SocialIcon name="instagram" /> Instagram <span aria-hidden="true">↗</span></a>
           <a class="social-button" :href="siteInfo.googleMaps" target="_blank" rel="noopener noreferrer"><SocialIcon name="google" /> Google <span aria-hidden="true">↗</span></a>
         </div>
-        <a href="#inicio">VOLVER ARRIBA ↑</a>
+      </div>
+      <div class="footer-legal">
+        <span>© 2026 LO DE PAC · TODOS LOS DERECHOS RESERVADOS</span>
+        <span>DESIGNED AND DEVELOPED BY <a href="https://latellier.com" target="_blank" rel="noopener noreferrer">LATELLIER <span aria-hidden="true">↗</span></a></span>
       </div>
     </footer>
     <button
@@ -1361,6 +1364,45 @@ $display: "Barlow Condensed", sans-serif;
     margin: 0.5em 0 0 0.5em;
   }
   .footer-socials { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+  .footer-legal {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #1f407550;
+    flex-wrap: wrap;
+    gap: 0.75rem 2rem;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.045em;
+  }
+  .footer-legal a {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--orange);
+    transition: color 0.2s, transform 0.2s;
+  }
+  .footer-legal a::after {
+    position: absolute;
+    right: 0;
+    bottom: -0.2rem;
+    left: 0;
+    height: 1px;
+    content: "";
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.2s;
+  }
+  .footer-legal a:hover, .footer-legal a:focus-visible {
+    color: var(--navy);
+    transform: translateY(-2px);
+  }
+  .footer-legal a:hover::after, .footer-legal a:focus-visible::after {
+    transform: scaleX(1);
+  }
   .social-button {
     display: inline-flex;
     align-items: center;
@@ -1381,7 +1423,7 @@ $display: "Barlow Condensed", sans-serif;
   .footer-bottom {
     margin-top: 2rem;
     border-top: 1px solid #1f407550;
-    padding-top: 1.25rem;
+    padding-top: 1.45rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1646,6 +1688,12 @@ $display: "Barlow Condensed", sans-serif;
     }
     .footer-bottom > span {
       width: 100%;
+    }
+    .footer-legal {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 0.5rem;
+      font-size: 0.64rem;
     }
   }
   @media (hover: none) {
