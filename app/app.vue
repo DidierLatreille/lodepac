@@ -128,8 +128,8 @@
             <h2 id="menu-title">ELEGÍ TU<br /><span>BURRITO.</span></h2>
           </div>
           <p>
-            Birria, Korean BBQ Chicken y Philly Cheesesteak.<br />El mismo
-            compromiso con el relleno.
+            Birria, Korean BBQ Chicken y CheeseBurger.<br />El mismo
+            compromiso con el relleno. <br>~350 g por burrito 
           </p>
         </div>
         <div class="burrito-grid">
@@ -146,7 +146,7 @@
             <h3>
               {{ burrito.name
               }}<span v-if="burrito.className === 'korean'">CHICKEN</span
-              ><span v-if="burrito.className === 'philly'">CHEESESTEAK</span>
+              ><span v-if="burrito.className === 'burger'">BURGER</span>
             </h3>
             <p class="card-subtitle">{{ burrito.subtitle }}</p>
             <div class="card-tags">
@@ -311,7 +311,7 @@ useHead({
 });
 
 const instagram = siteInfo.instagram;
-const stripFlavors = ["BIRRIA", "KOREAN BBQ", "PHILLY CHEESESTEAK", "BIRRIA", "KOREAN BBQ", "PHILLY CHEESESTEAK"] as const;
+const stripFlavors = ["BIRRIA", "KOREAN BBQ", "CHEESEBURGER", "BIRRIA", "KOREAN BBQ", "CHEESEBURGER"] as const;
 const unitPrice = 14000;
 const formattedPrice = new Intl.NumberFormat("es-AR", {
   style: "currency",
@@ -402,11 +402,11 @@ function onPagePointerDown(event: PointerEvent) {
 const menuNames = {
   birria: "Burrito de birria",
   korean: "Burrito Korean BBQ Chicken",
-  philly: "Burrito Philly Cheesesteak",
+  burger: "Burrito de Cheeseburger",
 } as const;
 type BurritoId = keyof typeof menuNames;
 type Cart = Record<BurritoId, number>;
-const cart = reactive<Cart>({ birria: 0, korean: 0, philly: 0 });
+const cart = reactive<Cart>({ birria: 0, korean: 0, burger: 0 });
 const cartItems = computed(() =>
   (Object.keys(menuNames) as BurritoId[])
     .filter((id) => cart[id] > 0)
@@ -477,7 +477,7 @@ const burritos = [
     description:
       "Carne tierna y desmechada, cocinada durante horas con chiles y especias. Mucho queso y una tortilla lista para bancarse todo.",
     tags: ["COCCIÓN LENTA", "MUCHO QUESO"],
-    detail: "Aprox. 350 g por burrito · Aprox. 70 g de proteína",
+    detail: "Aprox. 70 g de proteína",
     className: "birria",
   },
   {
@@ -492,13 +492,13 @@ const burritos = [
   },
   {
     number: "03",
-    name: "PHILLY",
-    subtitle: "Cheesesteak en modo burrito.",
+    name: "CHEESE",
+    subtitle: "Cheeseburger en modo burrito.",
     description:
-      "El Philly Cheesesteak también juega en este equipo. Una tercera forma de resolver ese antojo que no se negocia.",
-    tags: ["CHEESESTEAK", "ANTOJO RESUELTO"],
-    detail: "Consultanos los ingredientes por Instagram.",
-    className: "philly",
+      "Todo lo que te gusta de una cheeseburger, pero envuelto en una tortilla y llevado a otro nivel. Carne vacuna bien dorada, cebolla y abundante cheddar fundido, todo dentro de una tortilla de harina. Simple, contundente y cargado de sabor. 🍔🌯",
+    tags: ["CHEESEBURGER", "ANTOJO RESUELTO"],
+    detail: "Aprox. 80g de proteína",
+    className: "burger",
   },
  ] as const;
 
@@ -1001,7 +1001,7 @@ $display: "Barlow Condensed", sans-serif;
   .burrito-card.korean {
     background: var(--orange);
   }
-  .burrito-card.philly {
+  .burrito-card.burger {
     background: var(--paper);
   }
   .burrito-card:hover,

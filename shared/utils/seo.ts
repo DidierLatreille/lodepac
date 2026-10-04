@@ -1,7 +1,7 @@
 export const siteInfo = {
   name: 'Lo de Pac',
   title: 'Burritos en Vicente López y Martínez | Lo de Pac',
-  description: 'Pedí burritos de birria, Korean BBQ Chicken y Philly Cheesesteak en Lo de Pac. Delivery en Vicente López y Martínez, jueves a sábados de 20 a 23 h.',
+  description: 'Pedí burritos de birria, Korean BBQ Chicken y CheeseBurger en Lo de Pac. Delivery en Vicente López y Martínez, jueves a sábados de 20 a 23 h.',
   language: 'es-AR',
   instagram: 'https://www.instagram.com/lodepac/',
   googleMaps: 'https://www.google.com/maps?cid=6502303075585035578',
