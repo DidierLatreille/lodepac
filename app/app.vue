@@ -1690,7 +1690,7 @@ $display: "Barlow Condensed", sans-serif;
       width: 100%;
     }
     .footer-legal {
-      align-items: flex-start;
+      align-items: center;
       flex-direction: column;
       gap: 0.5rem;
       font-size: 0.64rem;
