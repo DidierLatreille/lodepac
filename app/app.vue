@@ -145,8 +145,9 @@
             </div>
             <h3>
               {{ burrito.name
-              }}<span v-if="burrito.className === 'korean'">CHICKEN</span
-              ><span v-if="burrito.className === 'burger'">BURGER</span>
+              }}
+              <!-- <span v-if="burrito.className === 'korean'">CHICKEN</span> -->
+              <!-- <span v-if="burrito.className === 'burger'">BURGER</span> -->
             </h3>
             <p class="card-subtitle">{{ burrito.subtitle }}</p>
             <div class="card-tags">
@@ -485,7 +486,7 @@ const burritos = [
   },
   {
     number: "02",
-    name: "KOREAN BBQ",
+    name: "KOREAN BBQ CHICKEN",
     subtitle: "Chicken con otro level.",
     description:
       "Pollo desmenuzado, cebolla caramelizada y una salsa con gochujang, mostaza y especias. Dulce, apenas picante y con cheddar fundido.",
@@ -495,7 +496,7 @@ const burritos = [
   },
   {
     number: "03",
-    name: "CHEESE",
+    name: "CHEESEBURGER",
     subtitle: "Cheeseburger en modo burrito.",
     description:
       "Todo lo que te gusta de una cheeseburger, pero envuelto en una tortilla y llevado a otro nivel. Carne vacuna bien dorada, cebolla y abundante cheddar fundido, todo dentro de una tortilla de harina. Simple, contundente y cargado de sabor. 🍔🌯",
